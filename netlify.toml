@@ -1,7 +1,7 @@
 [build]
   base = "frontend/vite-project"
   command = "npm run build"
-  publish = "dist"
+  publish = "frontend/vite-project/dist"
 
 [[redirects]]
   from = "/*"
