@@ -1,56 +1,83 @@
-# Smart Interview Backend
+# Smart Interview — Backend (Express + PostgreSQL)
 
-Express + PostgreSQL backend for Smart Interview project.
+Node.js + Express backend with Neon PostgreSQL. Deployed on Render.
 
-## Setup
+## Tech Stack
 
-1. Install dependencies:
+- Node.js + Express
+- PostgreSQL via `pg` (Neon hosted)
+- JWT authentication (`jsonwebtoken`)
+- Password hashing (`bcrypt`)
 
-   ```bash
-   cd backend
-   npm install
-   ```
+## Local Setup
 
-2. Copy env example:
+```bash
+npm install
+```
 
-   ```bash
-   cp .env.example .env
-   ```
+Create `.env`:
+```
+PORT=5000
+DATABASE_URL=postgresql://<user>:<password>@<host>/<db>?sslmode=require
+JWT_SECRET=your_secret_key
+```
 
-3. Create database in PostgreSQL:
+Run migrations:
+```bash
+npm run migrate
+```
 
-   ```sql
-   CREATE DATABASE smart_interview;
-   ```
+Seed 50 questions into DB:
+```bash
+node src/scripts/seed.js
+```
 
-4. Configure `DATABASE_URL` / `JWT_SECRET` in `.env`.
+Start dev server:
+```bash
+npm run dev
+```
 
-5. Run migrations:
+Runs at **http://localhost:5000**
 
-   ```bash
-   npm run migrate
-   ```
+## API Endpoints
 
-6. Start server:
-   ```bash
-   npm run dev
-   ```
+### Auth (Public)
+| Method | Route | Body |
+|---|---|---|
+| POST | `/api/auth/register` | `{ name, email, password, role }` |
+| POST | `/api/auth/login` | `{ email, password }` |
 
-## API endpoints
+### Questions (Bearer token required)
+| Method | Route | Description |
+|---|---|---|
+| GET | `/api/questions/:category` | Get 10 questions for a category |
 
-- POST `/api/auth/register`
-- POST `/api/auth/login`
-- GET `/api/questions/:category` (auth bearer token)
-- POST `/api/results/submit` (auth bearer token)
-- GET `/api/results` (auth bearer token)
-- GET `/api/results/analytics` (auth bearer token)
-- Admin endpoints require `role=admin`:
-  - GET `/api/admin/questions`
-  - POST `/api/admin/questions`
-  - PUT `/api/admin/questions/:id`
-  - DELETE `/api/admin/questions/:id`
-  - GET `/api/admin/results`
+### Results (Bearer token required)
+| Method | Route | Description |
+|---|---|---|
+| POST | `/api/results/submit` | Submit test answers, get score |
+| GET | `/api/results` | Get logged-in user's test history |
+| GET | `/api/results/analytics` | Get topic-wise performance analytics |
 
-## Frontend adaptation
+### Admin (Bearer token + admin role required)
+| Method | Route | Description |
+|---|---|---|
+| GET | `/api/admin/questions` | Get all questions |
+| POST | `/api/admin/questions` | Add new question |
+| PUT | `/api/admin/questions/:id` | Edit question |
+| DELETE | `/api/admin/questions/:id` | Delete question |
+| GET | `/api/admin/results` | Get all student results |
+| POST | `/api/admin/seed-questions` | Seed default 50 questions |
 
-In `frontend/vite-project/src/services/api.js`, replace mock APIs with network calls (e.g., `fetch` or `axios`) pointing to backend host `http://localhost:5000`.
+## Database Schema
+
+**users** — id, name, email, password_hash, role, created_at  
+**questions** — id, category, question, options (JSONB), correct_answer, difficulty, created_at  
+**results** — id, user_id (FK), category, score, total_questions, percentage, created_at
+
+## Deployment (Render)
+
+- Root directory: `backend`
+- Build command: `npm install`
+- Start command: `node src/index.js`
+- Environment variables: `DATABASE_URL`, `JWT_SECRET`, `PORT`

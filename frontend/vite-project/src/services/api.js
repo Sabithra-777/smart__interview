@@ -29,25 +29,16 @@ export const authService = {
 
 export const testService = {
   getQuestions: async (category, token = localStorage.getItem("token")) => {
-    const data = await request(
-      `/api/questions/${encodeURIComponent(category)}`,
-      "GET",
-      null,
-      token,
-    );
-    return data;
+    return request(`/api/questions/${encodeURIComponent(category)}`, "GET", null, token);
   },
   submitTest: async (testData, token = localStorage.getItem("token")) => {
-    const data = await request("/api/results/submit", "POST", testData, token);
-    return data;
+    return request("/api/results/submit", "POST", testData, token);
   },
   getResults: async (token = localStorage.getItem("token")) => {
-    const data = await request("/api/results", "GET", null, token);
-    return data;
+    return request("/api/results", "GET", null, token);
   },
   getAnalytics: async (token = localStorage.getItem("token")) => {
-    const data = await request("/api/results/analytics", "GET", null, token);
-    return data;
+    return request("/api/results/analytics", "GET", null, token);
   },
 };
 
